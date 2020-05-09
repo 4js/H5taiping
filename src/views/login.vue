@@ -15,6 +15,13 @@
                 label="手机号"
                 placeholder="请输入您的手机号"
             />
+            <van-field
+                value="area"
+                clearable
+                right-icon="arrow-down"
+                label="区域"
+                placeholder="请选择区域"
+            />
             <div class="login-top-box"></div>
             <van-button round class="btn-login" type="primary" block>登录</van-button>
         </div>
@@ -24,8 +31,16 @@
     </div>
 </template>
 <script>
+import { getAreaList } from '@/api/home'
+import Wx from 'weixin-js-sdk';
 export default {
-    name: 'login'
+    name: 'login',
+    created(){
+        getAreaList().then(res => {
+            console.log(res)
+        })
+        wx
+    }
 }
 </script>
 <style lang="scss" scoped>

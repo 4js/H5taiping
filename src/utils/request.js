@@ -1,36 +1,72 @@
+import Vue from 'vue'
 import axios from 'axios'
 import store from '@/store'
-import {Toast} from 'vant'
-// 根据环境不同引入不同api地址
+import qs from 'qs'
+import {Toast,Notify} from 'vant'
+// import notification from 'ant-design-vue/es/notification'
+// import { VueAxios } from './axios'
 import {baseApi} from '@/config'
-// create an axios instance
+
+// 创建 axios 实例
 const service = axios.create({
-  baseURL: baseApi, // url = base api url + request url
-  withCredentials: true, // send cookies when cross-domain requests
-  timeout: 5000 // request timeout
+  baseURL: baseApi, // api base_url
+  timeout: 6000 // 请求超时时间
 })
 
-// request拦截器 request interceptor
-service.interceptors.request.use(
-  config => {
-    // 不传递默认开启loading
-    if (!config.hideloading) {
-      // loading
-      Toast.loading({
-        forbidClick: true
+const err = (error) => {
+  if (error.response) {
+    const data = error.response.data
+    // const token = Vue.ls.get(ACCESS_TOKEN)
+    if (error.response.status === 403) {
+      // notification.error({
+      //   message: 'Forbidden',
+      //   description: data.message
+      // })
+      Notify({ type: 'danger', message: data.message });
+    }
+    if (error.response.status === 401 && !(data.result && data.result.isLogin)) {
+      notification.error({
+        message: 'Unauthorized',
+        description: 'Authorization verification failed'
       })
+      Notify({ type: 'danUnauthorizedger', message: 'Authorization verification failed' });
+      // if (token) {
+        store.dispatch('FedLogOut').then(() => {
+          setTimeout(() => {
+            window.location.reload()
+          }, 1500)
+        })
+      // }
     }
-    if (store.getters.token) {
-      config.headers['X-Token'] = ''
-    }
-    return config
-  },
-  error => {
-    // do something with request error
-    console.log(error) // for debug
-    return Promise.reject(error)
   }
-)
+  return Promise.reject(error)
+}
+
+// request interceptor
+service.interceptors.request.use(config => {
+  // 不传递默认开启loading
+  if (!config.hideloading) {
+    // loading
+    Toast.loading({
+      forbidClick: true
+    })
+  }
+  // if (store.getters.token) {
+  //   config.headers['X-Token'] = store.getters.token
+  // }
+  if (store.getters.token) {
+    config.data = Object.assign({ key_token: store.getters.token, admin_id: '21212' }, config.data) // 让每个请求携带自定义 token 请根据实际情况自行修改
+  }
+  config.data = qs.stringify(config.data)
+  return config
+},
+error => {
+  Toast.clear()
+  // do something with request error
+  console.log(error) // for debug
+  return Promise.reject(error)
+})
+
 // respone拦截器
 service.interceptors.response.use(
   response => {
@@ -54,5 +90,12 @@ service.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
+// const installer = {
+//   vm: {},
+//   install (Vue) {
+//     Vue.use(VueAxios, service)
+//   }
+// }
 
 export default service
