@@ -4,43 +4,89 @@
         <div class="tips">您还未绑定工号，请填写员工信息</div>
         <div class="login-wrapper">
             <van-field
-                value="username"
+                v-model="username"
                 clearable
                 label="工号"
                 placeholder="请输入您的工号"
             />
             <van-field
-                value="phone"
+                v-model="phone"
                 clearable
                 label="手机号"
                 placeholder="请输入您的手机号"
             />
             <van-field
-                value="area"
-                clearable
+                v-model="area"
+                readonly
                 right-icon="arrow-down"
                 label="区域"
+                @click="showArea"
                 placeholder="请选择区域"
             />
             <div class="login-top-box"></div>
-            <van-button round class="btn-login" type="primary" block>登录</van-button>
+            <van-button round class="btn-login" type="primary" block @click="toLogin">登录</van-button>
         </div>
         <div class="img-logo">
             <img src="../assets/logo.png" mode="widthFix"/>
         </div>
+        <van-popup
+          v-model="show"
+          position="bottom"
+          :style="{ height: '30%' }"
+        >
+          <van-picker show-toolbar :columns="columns" @confirm="handleConfirm" @cancel="handleCancel"/>
+        </van-popup>
     </div>
 </template>
 <script>
+function zhuanArea(arr){
+  return arr.map(item => {
+    item.text = item.area_name
+    if(item.child) item.children = zhuanArea(item.child)
+    return item
+  })
+}
 import { getAreaList } from '@/api/home'
 import Wx from 'weixin-js-sdk';
 export default {
-    name: 'login',
-    created(){
-        getAreaList().then(res => {
-            console.log(res)
-        })
-        wx
+  name: 'login',
+  data () {
+    return {
+      username: '',
+      phone: '',
+      area: '',
+      area_id: '',
+      show: false,
+      columns: []
     }
+  },
+  created(){
+    getAreaList().then(res => {
+      console.log(res)
+      this.columns = zhuanArea(res.data)
+    })
+  },
+  methods: {
+    showArea(){
+      this.show = true
+    },
+    handleConfirm(picker,value){
+      let city = this.columns[value[0]]
+      for (let i = 1;i<value.length;i++){
+        city = city.child[value[i]]
+      }
+      this.area_id = city.id
+      this.area = picker.join('/')
+      this.show = false
+    },
+    handleCancel(){
+      this.show = false
+    },
+    toLogin() {
+      const {username, phone, area} = this
+      console.log(username, phone, area)
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>
@@ -72,7 +118,7 @@ export default {
 }
 .login-wrapper{
     width: 240px;
-    height: 180px;
+    height: 220px;
     margin: 40px auto 0;
     padding: 30px;
     background-color: #fff;
