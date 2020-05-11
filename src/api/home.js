@@ -75,3 +75,15 @@ export function getUserPrizeList (data) {
     data
   })
 }
+
+// code换取微信用户信息
+export function getCodeToWxUserInfo (data) {
+  return request({
+    url: '?c=wxwebimpower&a=userinfo&site=useractivity',
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    data
+  })
+}

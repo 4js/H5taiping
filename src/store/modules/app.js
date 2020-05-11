@@ -1,9 +1,15 @@
 const state = {
-  userName: ''
+  userName: '',
+  wxUserInfo: {
+    openid: ''
+  }
 }
 const mutations = {
   SET_USER_NAME(state, name) {
     state.userName = name
+  },
+  SET_wxUserInfo(state, payload = {}) {
+    state.wxUserInfo = payload
   }
 }
 const actions = {

@@ -43,7 +43,7 @@ export const router = [
 
 const createRouter = () =>
   new Router({
-    mode: 'history', // 如果你是 history模式 需要配置vue.config.js publicPath
+    // mode: 'history', // 如果你是 history模式 需要配置vue.config.js publicPath
     // base: '/app/',
     scrollBehavior: () => ({y: 0}),
     routes: router

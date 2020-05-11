@@ -108,3 +108,13 @@ export function param2Obj(url) {
       '"}'
   )
 }
+
+/**
+ * @param {string} redirect wx server for get code
+ * @returns {Object}
+ */
+export function redirectToWxForCode() {
+  const redirectUrl = encodeURIComponent(`${location.origin}/`)
+  // const redirectUrl = encodeURIComponent(`http://test.service.agent.topasst.com/`)
+  location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxcfe4d61a502ee433&redirect_uri=${redirectUrl}&response_type=code&scope=snsapi_userinfo&connect_redirect=1#wechat_redirect`
+}
